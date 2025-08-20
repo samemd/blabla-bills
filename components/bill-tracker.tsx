@@ -276,7 +276,7 @@ export function BillTracker() {
                     <span>elapsed</span>
                   </div>
 
-                  <div className="mt-6 flex gap-3">
+                  <div className="mt-6 grid sm:flex gap-3">
                     <Button
                       variant="secondary"
                       onClick={() => setIsRunning((r) => !r)}
@@ -357,8 +357,8 @@ export function BillTracker() {
               <Separator className="my-8" />
 
               {/* Meeting Details */}
-              <div className="grid gap-4 md:grid-cols-2 justify-items-center">
-                <div>
+              <div className="grid gap-4 sm:grid-cols-2 justify-items-center">
+                <div className="text-center sm:text-start">
                   <h3 className="font-semibold text-foreground">
                     Meeting Details
                   </h3>
@@ -378,7 +378,7 @@ export function BillTracker() {
                   </div>
                 </div>
 
-                <div>
+                <div className="text-center sm:text-start">
                   <h3 className="font-semibold text-foreground">
                     Time Investment
                   </h3>
