@@ -15,8 +15,8 @@ export const CURRENCIES: {
 export function formatCurrency(
   value: number,
   currency: CurrencyCode,
-  minFrac = 0,
-  maxFrac = 1,
+  minFrac = 2,
+  maxFrac = 2,
 ) {
   const symbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "CHF";
   const formatted = new Intl.NumberFormat("de-CH", {
