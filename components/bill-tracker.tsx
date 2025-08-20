@@ -317,7 +317,7 @@ export function BillTracker() {
                   Meeting Summary
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  Here's what this meeting cost your organization
+                  Here&apos;s what this meeting cost your organization
                 </p>
               </div>
 
