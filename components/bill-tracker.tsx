@@ -22,6 +22,12 @@ import { formatDuration } from "@/lib/utils";
 import { Milestone } from "@/components/milestone/milestone";
 import { NextMilestone } from "@/components/milestone/next-milestone";
 import { MilestoneList } from "@/components/milestone/milestone-list";
+import {
+  InputBase,
+  InputBaseAdornment,
+  InputBaseControl,
+  InputBaseInput,
+} from "@/components/ui/input-base";
 
 export function BillTracker() {
   const [step, setStep] = useState<"setup" | "track" | "summary">("setup");
@@ -58,6 +64,8 @@ export function BillTracker() {
     const total = step === "summary" ? finalTotal : rawTotal;
     return thingsInCurrency.filter((t) => total >= t.price);
   }, [thingsInCurrency, rawTotal, finalTotal, step]);
+
+  const symbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "CHF";
 
   // Tick every second
   useEffect(() => {
@@ -186,9 +194,24 @@ export function BillTracker() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="text-sm text-foreground">
-                      {formatCurrency(hourlyWage, currency, 0, 0)}/h
-                    </div>
+                    <InputBase>
+                      <InputBaseAdornment>{symbol}</InputBaseAdornment>
+                      <InputBaseControl>
+                        <InputBaseInput
+                          id="wage"
+                          type="number"
+                          inputMode="decimal"
+                          min={0}
+                          step="1"
+                          max={300}
+                          value={hourlyWage}
+                          onChange={(e) =>
+                            setHourlyWage(Math.max(0, +e.target.value || 0))
+                          }
+                          className="w-20 text-end"
+                        />
+                      </InputBaseControl>
+                    </InputBase>
                   </div>
                 </div>
                 <Slider
