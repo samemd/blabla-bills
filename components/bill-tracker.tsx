@@ -342,7 +342,7 @@ export function BillTracker() {
                   <div className="text-4xl font-bold text-foreground">
                     {formatDuration(finalElapsedSeconds)}
                   </div>
-                  <p className="text-sm text-muted-foreground">Time waisted</p>
+                  <p className="text-sm text-muted-foreground">Time wasted</p>
                 </div>
 
                 {/* Total Cost */}
@@ -350,7 +350,7 @@ export function BillTracker() {
                   <div className="text-4xl font-bold text-foreground">
                     {formatCurrency(finalTotal, currency)}
                   </div>
-                  <p className="text-sm text-muted-foreground">Money waisted</p>
+                  <p className="text-sm text-muted-foreground">Money wasted</p>
                 </div>
               </div>
 
