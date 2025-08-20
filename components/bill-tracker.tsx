@@ -15,20 +15,24 @@ import {
 import { CURRENCIES, CurrencyCode, formatCurrency } from "@/lib/currency";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
-import { NextMilestone } from "@/components/next-milestone";
-import { Milestones } from "@/components/milestones";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ThingInCurrency, THINGS } from "@/lib/things";
 import { useAnimatedNumber } from "@/hooks/use-animated-number";
+import { formatDuration } from "@/lib/utils";
+import { Milestone } from "@/components/milestone/milestone";
+import { NextMilestone } from "@/components/milestone/next-milestone";
+import { MilestoneList } from "@/components/milestone/milestone-list";
 
 export function BillTracker() {
-  const [step, setStep] = useState<"setup" | "track">("setup");
+  const [step, setStep] = useState<"setup" | "track" | "summary">("setup");
   const [participants, setParticipants] = useState<number>(5);
   const [currency, setCurrency] = useState<CurrencyCode>("CHF");
   const [hourlyWage, setHourlyWage] = useState<number>(50);
 
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
+  const [finalElapsedSeconds, setFinalElapsedSeconds] = useState<number>(0);
+  const [showAllItems, setShowAllItems] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const costPerSecond = useMemo(() => {
@@ -37,6 +41,7 @@ export function BillTracker() {
   }, [participants, hourlyWage]);
 
   const rawTotal = elapsedSeconds * costPerSecond;
+  const finalTotal = finalElapsedSeconds * costPerSecond;
   const animatedTotal = useAnimatedNumber(rawTotal, 0.85);
 
   // Timeline conversion helpers
@@ -48,6 +53,11 @@ export function BillTracker() {
       price: t.priceEUR * eurRate,
     })).sort((a, b) => a.price - b.price);
   }, [eurRate]);
+
+  const unlockedThings = useMemo(() => {
+    const total = step === "summary" ? finalTotal : rawTotal;
+    return thingsInCurrency.filter((t) => total >= t.price);
+  }, [thingsInCurrency, rawTotal, finalTotal, step]);
 
   // Tick every second
   useEffect(() => {
@@ -70,6 +80,19 @@ export function BillTracker() {
     setIsRunning(false);
     setStep("setup");
     setElapsedSeconds(0);
+  }
+
+  function handleFinish() {
+    setIsRunning(false);
+    setFinalElapsedSeconds(elapsedSeconds);
+    setStep("summary");
+  }
+
+  function handleNewMeeting() {
+    setStep("setup");
+    setElapsedSeconds(0);
+    setFinalElapsedSeconds(0);
+    setIsRunning(false);
   }
 
   return (
@@ -183,19 +206,14 @@ export function BillTracker() {
               </div>
 
               <div className="mt-8 flex justify-center">
-                <Button
-                  size="lg"
-                  className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-fuchsia-500 text-white"
-                  onClick={handleStart}
-                >
-                  <span className="relative z-10">Start Tracking</span>
-                  <span className="absolute inset-0 -z-0 translate-y-[120%] bg-white/20 transition-transform duration-500 group-hover:translate-y-0" />
+                <Button size="lg" variant="special" onClick={handleStart}>
+                  Start Tracking
                 </Button>
               </div>
             </CardContent>
           </Card>
         </motion.section>
-      ) : (
+      ) : step === "track" ? (
         <motion.section
           key="track"
           initial={{ opacity: 0, y: 8 }}
@@ -216,7 +234,7 @@ export function BillTracker() {
                     </div>
                   </div>
 
-                  <div className="mt-4 text-5xl font-extrabold tracking-tight text-foreground md:text-6xl">
+                  <div className="tabular-nums mt-4 text-5xl font-extrabold tracking-tight text-foreground md:text-6xl">
                     {formatCurrency(animatedTotal, currency)}
                   </div>
 
@@ -245,21 +263,221 @@ export function BillTracker() {
                     <Button variant="destructive" onClick={handleStop}>
                       Stop & reset
                     </Button>
+                    <Button onClick={handleFinish}>Finish</Button>
                   </div>
                 </div>
 
-                {/* Next milestone */}
                 <NextMilestone
                   things={thingsInCurrency}
                   total={rawTotal}
                   currency={currency}
                 />
               </div>
-              <Milestones
-                things={thingsInCurrency}
-                total={rawTotal}
-                currency={currency}
-              />
+              <MilestoneList things={unlockedThings} currency={currency} />
+            </CardContent>
+          </Card>
+        </motion.section>
+      ) : (
+        <motion.section
+          key="summary"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25 }}
+          className="mx-auto max-w-4xl"
+        >
+          <Card>
+            <CardContent className="p-6 md:p-8">
+              {/* Header */}
+              <div className="text-center">
+                <h2 className="text-3xl font-bold text-foreground">
+                  Meeting Summary
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  Here's what this meeting cost your organization
+                </p>
+              </div>
+
+              <div className="mt-8 grid gap-6 md:grid-cols-3">
+                {/* Cost per minute */}
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-foreground">
+                    {formatCurrency(
+                      finalElapsedSeconds > 0
+                        ? (finalTotal / finalElapsedSeconds) * 60
+                        : 0,
+                      currency,
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Cost per minute
+                  </p>
+                </div>
+
+                {/* Duration */}
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-foreground">
+                    {formatDuration(finalElapsedSeconds)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Time waisted</p>
+                </div>
+
+                {/* Total Cost */}
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-foreground">
+                    {formatCurrency(finalTotal, currency)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Money waisted</p>
+                </div>
+              </div>
+
+              <Separator className="my-8" />
+
+              {/* Meeting Details */}
+              <div className="grid gap-4 md:grid-cols-2 justify-items-center">
+                <div>
+                  <h3 className="font-semibold text-foreground">
+                    Meeting Details
+                  </h3>
+                  <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    <div>{participants} participants</div>
+                    <div>
+                      {formatCurrency(hourlyWage, currency, 0, 0)} average
+                      hourly rate
+                    </div>
+                    <div>
+                      {formatCurrency(
+                        (participants * hourlyWage) / 60,
+                        currency,
+                      )}{" "}
+                      cost per minute
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-foreground">
+                    Time Investment
+                  </h3>
+                  <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    <div>
+                      {((finalElapsedSeconds * participants) / 60).toFixed(1)}{" "}
+                      total person-minutes
+                    </div>
+                    <div>
+                      {((finalElapsedSeconds * participants) / 3600).toFixed(1)}{" "}
+                      total person-hours
+                    </div>
+                    <div>
+                      {(
+                        (finalElapsedSeconds * participants) /
+                        (8 * 3600)
+                      ).toFixed(2)}{" "}
+                      person-days
+                      {(finalElapsedSeconds * participants) / (8 * 3600) >= 1
+                        ? " 🤯"
+                        : ""}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {unlockedThings.length > 0 && (
+                <>
+                  <Separator className="my-8" />
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-foreground">
+                        Items you could have bought instead
+                      </h3>
+                      {unlockedThings.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowAllItems(!showAllItems)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          {showAllItems ? (
+                            <>
+                              Show less
+                              <svg
+                                className="ml-1 h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 15l7-7 7 7"
+                                />
+                              </svg>
+                            </>
+                          ) : (
+                            <>
+                              Show all {unlockedThings.length}
+                              <svg
+                                className="ml-1 h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="mt-4">
+                      <div className="mb-3">
+                        <Milestone
+                          thing={unlockedThings[unlockedThings.length - 1]}
+                          currency={currency}
+                        />
+                      </div>
+                      <AnimatePresence>
+                        {showAllItems && unlockedThings.length > 1 && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-1 gap-3">
+                              {unlockedThings
+                                .slice(0, -1) // Exclude the most expensive item
+                                .reverse()
+                                .map((thing) => (
+                                  <Milestone
+                                    key={thing.name}
+                                    thing={thing}
+                                    currency={currency}
+                                  />
+                                ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Actions */}
+              <div className="mt-8 flex justify-center gap-3">
+                <Button onClick={handleNewMeeting} variant="special">
+                  Track New Meeting
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.section>
