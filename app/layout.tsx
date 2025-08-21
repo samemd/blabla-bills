@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BlablaBills",
+  title: "BlablaBills - The Cost of Endless Discussions",
   description: "Make the hidden cost of endless discussions obvious",
 };
 

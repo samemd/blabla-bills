@@ -243,7 +243,7 @@ export function BillTracker() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25 }}
-          className="mx-auto max-w-4xl"
+          className="mx-auto max-w-3xl"
         >
           <Card className="border-slate-200/70 bg-white/70 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
             <CardContent className="p-6 md:p-8">
@@ -307,7 +307,7 @@ export function BillTracker() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25 }}
-          className="mx-auto max-w-4xl"
+          className="mx-auto max-w-3xl"
         >
           <Card>
             <CardContent className="p-6 md:p-8">
