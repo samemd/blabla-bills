@@ -1,10 +1,18 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Milestone } from "@/components/milestone/milestone";
+import { MilestoneList } from "@/components/milestone/milestone-list";
+import { NextMilestone } from "@/components/milestone/next-milestone";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  InputBase,
+  InputBaseAdornment,
+  InputBaseControl,
+  InputBaseInput,
+} from "@/components/ui/input-base";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,46 +20,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CURRENCIES, CurrencyCode, formatCurrency } from "@/lib/currency";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ThingInCurrency, THINGS } from "@/lib/things";
 import { useAnimatedNumber } from "@/hooks/use-animated-number";
+import { CURRENCIES, CurrencyCode, formatCurrency } from "@/lib/currency";
+import { ThingInCurrency, THINGS } from "@/lib/things";
 import { formatDuration } from "@/lib/utils";
-import { Milestone } from "@/components/milestone/milestone";
-import { NextMilestone } from "@/components/milestone/next-milestone";
-import { MilestoneList } from "@/components/milestone/milestone-list";
-import {
-  InputBase,
-  InputBaseAdornment,
-  InputBaseControl,
-  InputBaseInput,
-} from "@/components/ui/input-base";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export function BillTracker() {
   const [step, setStep] = useState<"setup" | "track" | "summary">("setup");
   const [participants, setParticipants] = useState<number>(5);
   const [currency, setCurrency] = useState<CurrencyCode>("CHF");
-  const [hourlyWage, setHourlyWage] = useState<number>(50);
+  const [hourlyWage, setHourlyWage] = useState<number>(150);
 
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [finalElapsedSeconds, setFinalElapsedSeconds] = useState<number>(0);
   const [showAllItems, setShowAllItems] = useState(false);
+  
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const pausedTimeRef = useRef<number>(0);
 
-  const costPerSecond = useMemo(() => {
-    // participants * hourlyWage per hour -> per second
-    return (participants * hourlyWage) / 3600;
-  }, [participants, hourlyWage]);
+  const costPerSecond = (participants * hourlyWage) / 3600;
 
   const rawTotal = elapsedSeconds * costPerSecond;
   const finalTotal = finalElapsedSeconds * costPerSecond;
   const animatedTotal = useAnimatedNumber(rawTotal, 0.85);
 
-  // Timeline conversion helpers
-  const eurRate = CURRENCIES.find((c) => c.code === currency)?.eurRate ?? 1; // EUR -> currency
+  const eurRate = CURRENCIES.find((c) => c.code === currency)?.eurRate ?? 1;
 
   const thingsInCurrency: ThingInCurrency[] = useMemo(() => {
     return THINGS.map((t) => ({
@@ -67,33 +66,62 @@ export function BillTracker() {
 
   const symbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "CHF";
 
-  // Tick every second
+  // Tick based on actual elapsed time
   useEffect(() => {
     if (!isRunning) return;
+
+    if (!startTimeRef.current) {
+      startTimeRef.current = Date.now();
+    }
+
     intervalRef.current = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
+      if (startTimeRef.current) {
+        const elapsed = Math.floor(
+          (Date.now() - startTimeRef.current) / 1000 + pausedTimeRef.current
+        );
+        setElapsedSeconds(elapsed);
+      }
+    }, 100); // Update more frequently for smoother display
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isRunning]);
 
+  // Handle pause/resume
+  useEffect(() => {
+    if (!isRunning && startTimeRef.current !== null) {
+      // Paused
+      pausedTimeRef.current = elapsedSeconds;
+      startTimeRef.current = null;
+    } else if (isRunning && startTimeRef.current === null) {
+      // Resumed
+      startTimeRef.current = Date.now();
+    }
+  }, [isRunning, elapsedSeconds]);
+
   function handleStart() {
     setStep("track");
     setIsRunning(true);
     setElapsedSeconds(0);
+    startTimeRef.current = Date.now();
+    pausedTimeRef.current = 0;
   }
 
   function handleStop() {
     setIsRunning(false);
     setStep("setup");
     setElapsedSeconds(0);
+    startTimeRef.current = null;
+    pausedTimeRef.current = 0;
   }
 
   function handleFinish() {
     setIsRunning(false);
     setFinalElapsedSeconds(elapsedSeconds);
     setStep("summary");
+    startTimeRef.current = null;
+    pausedTimeRef.current = 0;
   }
 
   function handleNewMeeting() {
@@ -101,6 +129,8 @@ export function BillTracker() {
     setElapsedSeconds(0);
     setFinalElapsedSeconds(0);
     setIsRunning(false);
+    startTimeRef.current = null;
+    pausedTimeRef.current = 0;
   }
 
   return (

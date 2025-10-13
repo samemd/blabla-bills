@@ -1,9 +1,9 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
+import { Milestone } from "@/components/milestone/milestone";
 import { CurrencyCode } from "@/lib/currency";
 import { ThingInCurrency } from "@/lib/things";
-import { Milestone } from "@/components/milestone/milestone";
+import { AnimatePresence } from "framer-motion";
 
 type MilestonesProps = {
   things: ThingInCurrency[];
@@ -21,7 +21,6 @@ export function MilestoneList({ things, currency }: MilestonesProps) {
           <AnimatePresence initial={false}>
             {things
               .slice()
-              .reverse()
               .map((t) => (
                 <Milestone key={t.name} thing={t} currency={currency} />
               ))}
