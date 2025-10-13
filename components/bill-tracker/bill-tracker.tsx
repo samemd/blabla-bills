@@ -4,10 +4,10 @@ import { CURRENCIES, CurrencyCode } from "@/lib/currency";
 import { ThingInCurrency, THINGS } from "@/lib/things";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatedSection } from "./animations/animated-section";
-import { SetupStep } from "./bill-tracker/setup-step";
-import { SummaryStep } from "./bill-tracker/summary-step";
-import { TrackingStep } from "./bill-tracker/tracking-step";
+import { AnimatedSection } from "../animations/animated-section";
+import { SetupStep } from "./setup-step";
+import { SummaryStep } from "./summary-step";
+import { TrackingStep } from "./tracking-step";
 
 type Step = "setup" | "track" | "summary";
 
@@ -31,12 +31,10 @@ export function BillTracker() {
 
   const eurRate = CURRENCIES.find((c) => c.code === currency)?.eurRate ?? 1;
 
-  const thingsInCurrency: ThingInCurrency[] = useMemo(() => {
-    return THINGS.map((t) => ({
-      ...t,
-      price: t.priceEUR * eurRate,
-    })).sort((a, b) => a.price - b.price);
-  }, [eurRate]);
+  const thingsInCurrency: ThingInCurrency[] = THINGS.map((t) => ({
+    ...t,
+    price: Math.round(t.priceEUR * eurRate * 10) / 10,
+  })).sort((a, b) => a.price - b.price);
 
   const unlockedThings = useMemo(() => {
     const total = step === "summary" ? finalTotal : rawTotal;

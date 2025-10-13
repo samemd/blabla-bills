@@ -1,8 +1,7 @@
 "use client";
 
-import { CurrencyCode, formatCurrency } from "@/lib/currency";
 import { Progress } from "@/components/ui/progress";
-import { useMemo } from "react";
+import { CurrencyCode, formatCurrency } from "@/lib/currency";
 import { ThingInCurrency } from "@/lib/things";
 
 type NextMilestoneProps = {
@@ -12,21 +11,18 @@ type NextMilestoneProps = {
 };
 
 export function NextMilestone({ things, total, currency }: NextMilestoneProps) {
-  const nextThing = useMemo(() => {
-    return things.find((t) => total < t.price);
-  }, [total, things]);
+  const nextThing = things.find((t) => total < t.price);
 
-  const nextThingProgress = useMemo(() => {
-    if (!nextThing) return 100;
-    const prevPrice =
-      things
-        .filter((t) => t.price < nextThing.price)
-        .map((t) => t.price)
-        .pop() ?? 0;
-    const range = nextThing.price - prevPrice || nextThing.price;
-    const progress = ((total - prevPrice) / range) * 100;
-    return Math.max(0, Math.min(100, progress));
-  }, [total, nextThing, things]);
+  if (!nextThing) return null;
+
+  const prevPrice =
+    things
+      .filter((t) => t.price < nextThing.price)
+      .map((t) => t.price)
+      .pop() ?? 0;
+  const range = nextThing.price - prevPrice || nextThing.price;
+  const progress = ((total - prevPrice) / range) * 100;
+  const nextThingProgress = Math.max(0, Math.min(100, progress));
 
   return (
     <div className="relative rounded-lg border bg-white/60 p-6 dark:border-slate-800 dark:bg-slate-900/60">
@@ -44,7 +40,7 @@ export function NextMilestone({ things, total, currency }: NextMilestoneProps) {
                 <span className="font-semibold">{nextThing.name}</span>
               </div>
               <div className="text-sm text-slate-500 dark:text-slate-400">
-                {formatCurrency(nextThing.price, currency, 0, 1)}
+                {formatCurrency(nextThing.price, currency)}
               </div>
             </div>
             <Progress className="mt-3" value={nextThingProgress} />

@@ -1,4 +1,4 @@
-import { BillTracker } from "@/components/bill-tracker";
+import { BillTracker } from "@/components/bill-tracker/bill-tracker";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 
