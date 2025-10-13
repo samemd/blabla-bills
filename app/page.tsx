@@ -1,6 +1,6 @@
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { BillTracker } from "@/components/bill-tracker";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 
 export default async function Page() {
   return (
