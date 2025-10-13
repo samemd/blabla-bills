@@ -39,7 +39,7 @@ export function BillTracker() {
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [finalElapsedSeconds, setFinalElapsedSeconds] = useState<number>(0);
   const [showAllItems, setShowAllItems] = useState(false);
-  
+
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number>(0);
@@ -168,7 +168,7 @@ export function BillTracker() {
                       value={participants}
                       onChange={(e) =>
                         setParticipants(
-                          Math.max(1, Number(e.target.value) || 1),
+                          Math.max(1, Number(e.target.value) || 1)
                         )
                       }
                       className="text-center"
@@ -195,7 +195,7 @@ export function BillTracker() {
                     value={currency}
                     onValueChange={(val) => setCurrency(val as CurrencyCode)}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full" aria-label="Currency">
                       <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -250,6 +250,7 @@ export function BillTracker() {
                   max={300}
                   step={1}
                   onValueChange={([v]) => setHourlyWage(v)}
+                  aria-label="Hourly wage slider"
                 />
                 <div className="flex justify-between text-xs text-subtle">
                   <span>0</span>
@@ -359,7 +360,7 @@ export function BillTracker() {
                       finalElapsedSeconds > 0
                         ? (finalTotal / finalElapsedSeconds) * 60
                         : 0,
-                      currency,
+                      currency
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
@@ -401,7 +402,7 @@ export function BillTracker() {
                     <div>
                       {formatCurrency(
                         (participants * hourlyWage) / 60,
-                        currency,
+                        currency
                       )}{" "}
                       cost per minute
                     </div>
