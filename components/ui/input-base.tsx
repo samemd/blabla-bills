@@ -51,6 +51,14 @@ function InputBase({
   const [focused, setFocused] = React.useState(false);
   const controlRef = React.useRef<HTMLElement>(null);
 
+  const handleClick = React.useEffectEvent(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (controlRef.current && event.currentTarget === event.target) {
+        controlRef.current.focus();
+      }
+    },
+  );
+
   return (
     <InputBaseContext.Provider
       value={{
@@ -64,11 +72,7 @@ function InputBase({
         data-slot="input-base"
         // Based on MUI's <InputBase /> implementation.
         // https://github.com/mui/material-ui/blob/master/packages/mui-material/src/InputBase/InputBase.js#L458~L460
-        onClick={composeEventHandlers(onClick, (event) => {
-          if (controlRef.current && event.currentTarget === event.target) {
-            controlRef.current.focus();
-          }
-        })}
+        onClick={composeEventHandlers(onClick, handleClick)}
         className={cn(
           "border-input selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex min-h-9 cursor-text items-center gap-2 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
           disabled && "pointer-events-none cursor-not-allowed opacity-50",
