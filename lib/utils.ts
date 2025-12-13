@@ -38,5 +38,8 @@ Congratulation, this meeting wasted a total of ${formatCurrency(finalTotal, curr
 }
 
 export function getShareableLink(meetingId: string): string {
-  return `${process.env.NEXT_PUBLIC_APP_URL}/meeting/${meetingId}`;
+  if (process.env.NODE_ENV === "development") {
+    return `http://localhost:3000/meeting/${meetingId}`;
+  }
+  return `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/meeting/${meetingId}`;
 }
