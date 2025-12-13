@@ -74,7 +74,7 @@ export function SummaryStep({
           finalElapsedSeconds,
           finalTotal,
           currency,
-        }),
+        })
       );
       toast.success("Copied to clipboard!");
     } catch {
@@ -167,9 +167,9 @@ export function SummaryStep({
                     onClick={() => setShowAllItems(!showAllItems)}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {showAllItems
-                      ? "Show less"
-                      : `Show all ${unlockedThings.length}`}
+                    {showAllItems ?
+                      "Show less"
+                    : `Show all ${unlockedThings.length}`}
                     <ChevronDown
                       className={cn("size-4 transition-transform", {
                         "rotate-180": showAllItems,
@@ -216,7 +216,7 @@ export function SummaryStep({
         )}
 
         <div className="mt-8 flex justify-center gap-3">
-          <Button variant="special">
+          <Button variant="special" asChild>
             <Link href="/">
               {readonly ? "Track your own meeting" : "Track New Meeting"}
             </Link>
