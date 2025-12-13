@@ -22,6 +22,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground-accent: var(--muted-foreground-accent);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
@@ -78,6 +79,7 @@
 
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(44.6% 0.043 257.281);
+  --muted-foreground-accent: oklch(28.949% 0.02385 253.696);
 
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
@@ -106,7 +108,7 @@
 
   /* Brand pair (used for gradient button + radials) */
   --brand-1: oklch(0.64 0.2 264.4); /* blue */
-  --brand-2: oklch(0.72 0.25 328);  /* fuchsia */
+  --brand-2: oklch(0.72 0.25 328); /* fuchsia */
 
   /* Derived tints and lines */
   --tint-primary-12: color-mix(in oklch, var(--brand-1) 12%, transparent);
@@ -135,6 +137,7 @@
 
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(70.4% 0.04 256.788);
+  --muted-foreground-accent: oklch(84.18% 0.03572 260.421);
 
   --accent: oklch(44.6% 0.043 257.281);
   --accent-foreground: oklch(0.985 0 0);

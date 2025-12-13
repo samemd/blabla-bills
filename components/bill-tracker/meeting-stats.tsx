@@ -95,20 +95,11 @@ export function MeetingStats({
           <div className="flex items-center justify-center sm:justify-start">
             {hasVariation && settingsHistory ?
               <>
-                ~{displayParticipants.toFixed(1)} participants (avg)
-                <SettingsHistoryTooltip
-                  settingsHistory={settingsHistory}
-                  meetingStartedAt={meetingStartedAt}
-                  currency={currency}
-                />
-              </>
-            : <>{participants} participants</>}
-          </div>
-          <div className="flex items-center justify-center sm:justify-start">
-            {hasVariation && settingsHistory ?
-              <>
-                {formatCurrency(displayHourlyWage, currency, 0, 0)} hourly rate
-                (avg)
+                ~
+                <span className="text-muted-foreground-accent mr-1">
+                  {displayParticipants.toFixed(1)}
+                </span>
+                participants (avg)
                 <SettingsHistoryTooltip
                   settingsHistory={settingsHistory}
                   meetingStartedAt={meetingStartedAt}
@@ -116,15 +107,41 @@ export function MeetingStats({
                 />
               </>
             : <>
-                {formatCurrency(hourlyWage, currency, 0, 0)} average hourly rate
+                <span className="text-muted-foreground-accent mr-1">
+                  {participants}
+                </span>{" "}
+                participants
+              </>
+            }
+          </div>
+          <div className="flex items-center justify-center sm:justify-start">
+            {hasVariation && settingsHistory ?
+              <>
+                <span className="text-muted-foreground-accent mr-1">
+                  {formatCurrency(displayHourlyWage, currency, 0, 0)}
+                </span>
+                hourly rate (avg)
+                <SettingsHistoryTooltip
+                  settingsHistory={settingsHistory}
+                  meetingStartedAt={meetingStartedAt}
+                  currency={currency}
+                />
+              </>
+            : <>
+                <span className="text-muted-foreground-accent mr-1">
+                  {formatCurrency(hourlyWage, currency, 0, 0)}
+                </span>
+                average hourly rate
               </>
             }
           </div>
           <div>
-            {formatCurrency(
-              (displayParticipants * displayHourlyWage) / 60,
-              currency
-            )}{" "}
+            <span className="text-muted-foreground-accent mr-1">
+              {formatCurrency(
+                (displayParticipants * displayHourlyWage) / 60,
+                currency
+              )}
+            </span>
             cost per minute{hasVariation ? " (avg)" : ""}
           </div>
         </div>
@@ -134,18 +151,26 @@ export function MeetingStats({
         <h3 className="font-semibold text-foreground">Time Investment</h3>
         <div className="mt-2 space-y-1 text-sm text-muted-foreground">
           <div>
-            {((finalElapsedSeconds * effectiveParticipants) / 60).toFixed(1)}{" "}
+            <span className="text-muted-foreground-accent mr-1">
+              {((finalElapsedSeconds * effectiveParticipants) / 60).toFixed(1)}
+            </span>
             total person-minutes{hasVariation ? " (avg)" : ""}
           </div>
           <div>
-            {((finalElapsedSeconds * effectiveParticipants) / 3600).toFixed(1)}{" "}
+            <span className="text-muted-foreground-accent mr-1">
+              {((finalElapsedSeconds * effectiveParticipants) / 3600).toFixed(
+                1
+              )}
+            </span>
             total person-hours{hasVariation ? " (avg)" : ""}
           </div>
           <div>
-            {(
-              (finalElapsedSeconds * effectiveParticipants) /
-              (8 * 3600)
-            ).toFixed(2)}{" "}
+            <span className="text-muted-foreground-accent mr-1">
+              {(
+                (finalElapsedSeconds * effectiveParticipants) /
+                (8 * 3600)
+              ).toFixed(1)}
+            </span>
             person-days{hasVariation ? " (avg)" : ""}
             {(finalElapsedSeconds * effectiveParticipants) / (8 * 3600) >= 1 ?
               " 🤯"

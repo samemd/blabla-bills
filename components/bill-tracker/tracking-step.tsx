@@ -161,7 +161,7 @@ export function TrackingStep({
 
   return (
     <Card className="border-slate-200/70 bg-white/70 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
-      <CardContent className="px-6 md:px-8">
+      <CardContent className="p-6 md:p-8">
         <div className="relative mb-6 flex items-start justify-center">
           <div className="flex flex-col items-center">
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
