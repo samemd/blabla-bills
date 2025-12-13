@@ -9,21 +9,24 @@ interface LiveTotalProps {
   participants: number;
   currency: CurrencyCode;
   hourlyWage: number;
-  isRunning: boolean;
   elapsedSeconds: number;
   total: number;
-  onPauseResume: () => void;
-  onStop: () => void;
-  onFinish: () => void;
+  readonly?: boolean;
+  // Required when readonly=false
+  status?: "tracking" | "paused";
+  onPauseResume?: () => void;
+  onStop?: () => void;
+  onFinish?: () => void;
 }
 
 export function LiveTotal({
   participants,
   currency,
   hourlyWage,
-  isRunning,
   elapsedSeconds,
   total,
+  readonly = false,
+  status = "tracking",
   onPauseResume,
   onStop,
   onFinish,
@@ -39,7 +42,7 @@ export function LiveTotal({
         </div>
       </div>
 
-      <div className="tabular-nums mt-4 text-5xl font-extrabold tracking-tight text-foreground md:text-6xl">
+      <div className="tabular-nums mt-4 text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
         {formatCurrency(animatedTotal, currency)}
       </div>
 
@@ -58,15 +61,17 @@ export function LiveTotal({
         <span>elapsed</span>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:flex">
-        <Button variant="secondary" onClick={onPauseResume}>
-          {isRunning ? "Pause" : "Resume"}
-        </Button>
-        <Button variant="destructive" onClick={onStop}>
-          Stop & reset
-        </Button>
-        <Button onClick={onFinish}>Finish</Button>
-      </div>
+      {!readonly && (
+        <div className="mt-6 grid gap-3 sm:flex">
+          <Button variant="secondary" onClick={onPauseResume}>
+            {status === "tracking" ? "Pause" : "Resume"}
+          </Button>
+          <Button variant="destructive" onClick={onStop}>
+            Stop & reset
+          </Button>
+          <Button onClick={onFinish}>Finish</Button>
+        </div>
+      )}
     </div>
   );
 }

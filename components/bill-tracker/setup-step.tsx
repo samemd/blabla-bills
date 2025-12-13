@@ -17,11 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { CURRENCIES, CurrencyCode, formatCurrency } from "@/lib/currency";
+import { generateName } from "@/lib/name-generator";
+import { Separator } from "@/components/ui/separator";
+import { WandSparkles } from "lucide-react";
 
 interface SetupStepProps {
+  name: string;
+  setName: (value: string) => void;
   participants: number;
   setParticipants: (value: number) => void;
   currency: CurrencyCode;
@@ -32,6 +36,8 @@ interface SetupStepProps {
 }
 
 export function SetupStep({
+  name,
+  setName,
   participants,
   setParticipants,
   currency,
@@ -46,8 +52,31 @@ export function SetupStep({
     <Card>
       <CardContent className="p-6 md:p-8">
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Participants */}
+          {/* Meeting name */}
           <div className="space-y-3">
+            <Label htmlFor="name">Meeting Name</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="name"
+                placeholder="Enter meeting name"
+                className="flex-1"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setName(generateName())}
+                aria-label="Generate meeting name"
+              >
+                <WandSparkles className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Participants */}
+          <div className="space-y-3 row-start-2">
             <Label htmlFor="participants">Participants</Label>
             <div className="flex items-center gap-2">
               <Button
@@ -86,7 +115,7 @@ export function SetupStep({
           </div>
 
           {/* Currency */}
-          <div className="space-y-3">
+          <div className="space-y-3 row-start-2">
             <Label>Currency</Label>
             <Select
               value={currency}

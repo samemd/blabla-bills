@@ -3,57 +3,126 @@
 import { Milestone } from "@/components/milestone/milestone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { CurrencyCode, formatCurrency } from "@/lib/currency";
-import { ThingInCurrency } from "@/lib/things";
-import { cn, formatDuration } from "@/lib/utils";
+import { CURRENCIES, CurrencyCode, formatCurrency } from "@/lib/currency";
+import { ThingInCurrency, THINGS } from "@/lib/things";
+import {
+  cn,
+  formatDuration,
+  getShareableLink,
+  getShareableSummary,
+} from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, Copy, Link as LinkIcon, Share2 } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { MeetingStats } from "./meeting-stats";
 
 interface SummaryStepProps {
+  name: string;
+  meetingId: string;
   participants: number;
   currency: CurrencyCode;
   hourlyWage: number;
   finalElapsedSeconds: number;
   finalTotal: number;
-  unlockedThings: ThingInCurrency[];
-  onNewMeeting: () => void;
+  readonly?: boolean;
 }
 
 export function SummaryStep({
+  name,
+  meetingId,
   participants,
   currency,
   hourlyWage,
   finalElapsedSeconds,
   finalTotal,
-  unlockedThings,
-  onNewMeeting,
+  readonly = false,
 }: SummaryStepProps) {
   const [showAllItems, setShowAllItems] = useState(false);
+
+  const eurRate = CURRENCIES.find((c) => c.code === currency)?.eurRate ?? 1;
+
+  const thingsInCurrency: ThingInCurrency[] = useMemo(() => {
+    return THINGS.map((t) => ({
+      ...t,
+      price: Math.round(t.priceEUR * eurRate * 10) / 10,
+    })).sort((a, b) => a.price - b.price);
+  }, [eurRate]);
+
+  const unlockedThings = useMemo(() => {
+    return thingsInCurrency.filter((t) => finalTotal >= t.price);
+  }, [thingsInCurrency, finalTotal]);
+
+  const costPerMinute =
+    finalElapsedSeconds > 0 ? (finalTotal / finalElapsedSeconds) * 60 : 0;
+
+  const handleCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        getShareableSummary({
+          name,
+          participants,
+          finalElapsedSeconds,
+          finalTotal,
+          currency,
+        })
+      );
+      toast.success("Copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareableLink(meetingId));
+      toast.success("Link copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy link");
+    }
+  };
 
   return (
     <Card>
       <CardContent className="p-6 md:p-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-foreground">
-            Meeting Summary
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Here&apos;s what this meeting cost your organization
-          </p>
+        <div className="flex items-start justify-between">
+          <div className="flex-1 text-center">
+            <h2 className="text-3xl font-bold text-foreground">{name}</h2>
+            <p className="mt-2 text-muted-foreground">
+              Here&apos;s what this meeting cost your organization
+            </p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="shrink-0">
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleCopyText}>
+                <Copy className="mr-2 h-4 w-4" />
+                Copy as text
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCopyLink}>
+                <LinkIcon className="mr-2 h-4 w-4" />
+                Copy link
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <div className="text-center">
             <div className="text-4xl font-bold text-foreground">
-              {formatCurrency(
-                finalElapsedSeconds > 0
-                  ? (finalTotal / finalElapsedSeconds) * 60
-                  : 0,
-                currency
-              )}
+              {formatCurrency(costPerMinute, currency)}
             </div>
             <p className="text-sm text-muted-foreground">Cost per minute</p>
           </div>
@@ -97,9 +166,9 @@ export function SummaryStep({
                     onClick={() => setShowAllItems(!showAllItems)}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {showAllItems
-                      ? "Show less"
-                      : `Show all ${unlockedThings.length}`}
+                    {showAllItems ?
+                      "Show less"
+                    : `Show all ${unlockedThings.length}`}
                     <ChevronDown
                       className={cn("size-4 transition-transform", {
                         "rotate-180": showAllItems,
@@ -146,8 +215,10 @@ export function SummaryStep({
         )}
 
         <div className="mt-8 flex justify-center gap-3">
-          <Button onClick={onNewMeeting} variant="special">
-            Track New Meeting
+          <Button variant="special">
+            <Link href="/">
+              {readonly ? "Track your own meeting" : "Track New Meeting"}
+            </Link>
           </Button>
         </div>
       </CardContent>
