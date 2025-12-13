@@ -85,7 +85,7 @@ export function MeetingSettingsDropdown({
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Meeting settings">
+        <Button variant="outline" size="iconSm" aria-label="Meeting settings">
           <Settings className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -137,7 +137,7 @@ export function MeetingSettingsDropdown({
         <DropdownMenuSeparator className="my-4" />
 
         {/* Hourly Wage */}
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="settings-wage">Hourly wage</Label>
             <InputBase className="w-24">

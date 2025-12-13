@@ -81,7 +81,7 @@ export function SummaryStep({
           currency,
           meetingStartedAt,
           settingsHistory,
-        }),
+        })
       );
       toast.success("Copied to clipboard!");
     } catch {
@@ -110,7 +110,7 @@ export function SummaryStep({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="shrink-0">
+              <Button variant="outline" size="iconSm" className="shrink-0">
                 <Share2 className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -176,9 +176,9 @@ export function SummaryStep({
                     onClick={() => setShowAllItems(!showAllItems)}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {showAllItems
-                      ? "Show less"
-                      : `Show all ${unlockedThings.length}`}
+                    {showAllItems ?
+                      "Show less"
+                    : `Show all ${unlockedThings.length}`}
                     <ChevronDown
                       className={cn("size-4 transition-transform", {
                         "rotate-180": showAllItems,

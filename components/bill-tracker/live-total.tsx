@@ -4,6 +4,8 @@
 import { Button } from "@/components/ui/button";
 import { useAnimatedNumber } from "@/hooks/use-animated-number";
 import { CurrencyCode, formatCurrency } from "@/lib/currency";
+import { MeetingSettingsDropdown } from "./meeting-settings-dropdown";
+import type { Id } from "@/convex/_generated/dataModel";
 
 interface LiveTotalProps {
   participants: number;
@@ -13,6 +15,8 @@ interface LiveTotalProps {
   total: number;
   readonly?: boolean;
   // Required when readonly=false
+  meetingId?: Id<"meetings">;
+  controlToken?: string;
   status?: "tracking" | "paused";
   onPauseResume?: () => void;
   onStop?: () => void;
@@ -26,6 +30,8 @@ export function LiveTotal({
   elapsedSeconds,
   total,
   readonly = false,
+  meetingId,
+  controlToken,
   status = "tracking",
   onPauseResume,
   onStop,
@@ -41,6 +47,18 @@ export function LiveTotal({
           Running total
         </div>
       </div>
+
+      {!readonly && meetingId && controlToken && (
+        <div className="absolute right-4 top-4">
+          <MeetingSettingsDropdown
+            meetingId={meetingId}
+            controlToken={controlToken}
+            participants={participants}
+            hourlyWage={hourlyWage}
+            currency={currency}
+          />
+        </div>
+      )}
 
       <div className="tabular-nums mt-4 text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
         {formatCurrency(animatedTotal, currency)}

@@ -82,7 +82,7 @@ export function SetupStep() {
           </div>
 
           {/* Participants */}
-          <div className="space-y-3 row-start-2">
+          <div className="space-y-3 lg:row-start-2">
             <Label htmlFor="participants">Participants</Label>
             <div className="flex items-center gap-2">
               <Button
@@ -121,7 +121,7 @@ export function SetupStep() {
           </div>
 
           {/* Currency */}
-          <div className="space-y-3 row-start-2">
+          <div className="space-y-3 lg:row-start-2">
             <Label>Currency</Label>
             <Select
               value={currency}
@@ -147,7 +147,7 @@ export function SetupStep() {
         <Separator className="my-6 dark:bg-slate-800" />
 
         {/* Hourly wage */}
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           <div className="flex items-end justify-between gap-3">
             <div className="space-y-1">
               <Label htmlFor="wage">Average hourly wage per person</Label>
@@ -181,6 +181,7 @@ export function SetupStep() {
             step={1}
             onValueChange={([v]) => setHourlyWage(v)}
             aria-label="Hourly wage slider"
+            className="pt-2"
           />
           <div className="flex justify-between text-xs text-subtle">
             <span>0</span>

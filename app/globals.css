@@ -67,7 +67,7 @@
   --card: oklch(1 0 0);
   --card-foreground: oklch(20.8% 0.042 265.755);
 
-  --popover: oklch(1 0 0);
+  --popover: oklch(1 0 0 / 0.9);
   --popover-foreground: oklch(0.145 0 0);
 
   /* Semantic colors (neutral by default) */
@@ -126,7 +126,7 @@
   --card: oklch(20.8% 0.042 265.755 / 0.8);
   --card-foreground: oklch(0.985 0 0);
 
-  --popover: oklch(20.8% 0.042 265.755 / 0.5);
+  --popover: oklch(20.8% 0.042 265.755 / 0.9);
   --popover-foreground: oklch(0.985 0 0);
 
   --primary: oklch(0.922 0 0);

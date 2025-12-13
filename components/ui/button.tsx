@@ -27,13 +27,14 @@ const buttonVariants = cva(
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
+        iconSm: "size-8",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 function Button({
@@ -59,7 +60,7 @@ function Button({
       {variant === "special" && (
         <span
           className={cn(
-            "absolute inset-0 -z-0 translate-y-[120%] bg-white/15 transition-transform duration-500 group-hover:translate-y-0",
+            "absolute inset-0 -z-0 translate-y-[120%] bg-white/15 transition-transform duration-500 group-hover:translate-y-0"
           )}
         />
       )}

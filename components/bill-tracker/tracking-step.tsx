@@ -164,7 +164,7 @@ export function TrackingStep({
       <CardContent className="p-6 md:p-8">
         <div className="relative mb-6 flex items-start justify-center">
           <div className="flex flex-col items-center">
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+            <div className="mb-2 h-8 inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
               <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
               {status === "tracking" ? "Meeting in progress" : "Meeting paused"}
             </div>
@@ -172,16 +172,7 @@ export function TrackingStep({
           </div>
           {!readonly && (
             <div className="absolute right-0 top-0 flex items-center gap-2">
-              {controlToken && (
-                <MeetingSettingsDropdown
-                  meetingId={meetingId}
-                  controlToken={controlToken}
-                  participants={participants}
-                  hourlyWage={hourlyWage}
-                  currency={currency}
-                />
-              )}
-              <Button variant="outline" size="icon" onClick={handleCopyLink}>
+              <Button variant="outline" size="iconSm" onClick={handleCopyLink}>
                 <Share2 className="h-4 w-4" />
               </Button>
             </div>
@@ -196,6 +187,8 @@ export function TrackingStep({
             elapsedSeconds={elapsedSeconds}
             total={rawTotal}
             readonly={readonly}
+            meetingId={meetingId}
+            controlToken={controlToken}
             status={status}
             onPauseResume={handlePauseResume}
             onStop={handleStop}
