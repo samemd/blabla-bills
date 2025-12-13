@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LiveTotal } from "./live-total";
+import { MeetingSettingsDropdown } from "./meeting-settings-dropdown";
 
 interface TrackingStepProps {
   name: string;
@@ -25,6 +26,8 @@ interface TrackingStepProps {
   status: "tracking" | "paused";
   startedAt: number;
   accumulatedSeconds: number;
+  accumulatedCost: number;
+  costStartedAt: number;
   readonly?: boolean;
   controlToken?: string;
 }
@@ -38,6 +41,8 @@ export function TrackingStep({
   status,
   startedAt,
   accumulatedSeconds,
+  accumulatedCost,
+  costStartedAt,
   readonly = false,
   controlToken,
 }: TrackingStepProps) {
@@ -63,7 +68,7 @@ export function TrackingStep({
     return () => clearInterval(interval);
   }, [status]);
 
-  // Calculate elapsed time based on status
+  // Calculate elapsed time based on status (for display)
   const elapsedSeconds = useMemo(() => {
     if (status === "paused") {
       return accumulatedSeconds;
@@ -73,8 +78,25 @@ export function TrackingStep({
     return accumulatedSeconds + Math.max(0, elapsedSinceStart);
   }, [status, startedAt, accumulatedSeconds, currentTime]);
 
-  const costPerSecond = (participants * hourlyWage) / 3600;
-  const rawTotal = elapsedSeconds * costPerSecond;
+  // Calculate cost: accumulated cost + cost for current segment at current rate
+  const rawTotal = useMemo(() => {
+    if (status === "paused") {
+      // When paused, cost was already accumulated
+      return accumulatedCost;
+    }
+
+    // When tracking: accumulated cost + time since costStartedAt at current rate
+    const costSeconds = Math.floor((currentTime - costStartedAt) / 1000);
+    const costPerSecond = (participants * hourlyWage) / 3600;
+    return accumulatedCost + Math.max(0, costSeconds) * costPerSecond;
+  }, [
+    status,
+    currentTime,
+    costStartedAt,
+    accumulatedCost,
+    participants,
+    hourlyWage,
+  ]);
 
   const eurRate = CURRENCIES.find((c) => c.code === currency)?.eurRate ?? 1;
 
@@ -149,14 +171,20 @@ export function TrackingStep({
             <h1 className="text-2xl font-bold text-foreground">{name}</h1>
           </div>
           {!readonly && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyLink}
-              className="absolute right-0 top-0"
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
+            <div className="absolute right-0 top-0 flex items-center gap-2">
+              {controlToken && (
+                <MeetingSettingsDropdown
+                  meetingId={meetingId}
+                  controlToken={controlToken}
+                  participants={participants}
+                  hourlyWage={hourlyWage}
+                  currency={currency}
+                />
+              )}
+              <Button variant="outline" size="icon" onClick={handleCopyLink}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
 

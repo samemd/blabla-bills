@@ -65,6 +65,8 @@ export function MeetingView({ meetingId, token }: MeetingViewProps) {
         hourlyWage={meeting.hourlyWage}
         finalElapsedSeconds={meeting.finalElapsedSeconds ?? 0}
         finalTotal={meeting.finalTotal ?? 0}
+        meetingStartedAt={meeting.startedAt}
+        settingsHistory={meeting.settingsHistory}
         readonly={readonly}
       />
     );
@@ -80,6 +82,8 @@ export function MeetingView({ meetingId, token }: MeetingViewProps) {
       status={meeting.status}
       startedAt={meeting.startedAt}
       accumulatedSeconds={meeting.accumulatedSeconds}
+      accumulatedCost={meeting.accumulatedCost ?? 0}
+      costStartedAt={meeting.costStartedAt ?? meeting.startedAt}
       readonly={readonly}
       controlToken={hasControl ? token : undefined}
     />

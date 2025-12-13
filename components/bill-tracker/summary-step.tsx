@@ -18,6 +18,7 @@ import {
   formatDuration,
   getShareableLink,
   getShareableSummary,
+  SettingsHistoryEntry,
 } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Copy, Link as LinkIcon, Share2 } from "lucide-react";
@@ -34,6 +35,8 @@ interface SummaryStepProps {
   hourlyWage: number;
   finalElapsedSeconds: number;
   finalTotal: number;
+  meetingStartedAt: number;
+  settingsHistory?: SettingsHistoryEntry[];
   readonly?: boolean;
 }
 
@@ -45,6 +48,8 @@ export function SummaryStep({
   hourlyWage,
   finalElapsedSeconds,
   finalTotal,
+  meetingStartedAt,
+  settingsHistory,
   readonly = false,
 }: SummaryStepProps) {
   const [showAllItems, setShowAllItems] = useState(false);
@@ -74,7 +79,9 @@ export function SummaryStep({
           finalElapsedSeconds,
           finalTotal,
           currency,
-        })
+          meetingStartedAt,
+          settingsHistory,
+        }),
       );
       toast.success("Copied to clipboard!");
     } catch {
@@ -150,6 +157,8 @@ export function SummaryStep({
           currency={currency}
           hourlyWage={hourlyWage}
           finalElapsedSeconds={finalElapsedSeconds}
+          meetingStartedAt={meetingStartedAt}
+          settingsHistory={settingsHistory}
         />
 
         {unlockedThings.length > 0 && (
@@ -167,9 +176,9 @@ export function SummaryStep({
                     onClick={() => setShowAllItems(!showAllItems)}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {showAllItems ?
-                      "Show less"
-                    : `Show all ${unlockedThings.length}`}
+                    {showAllItems
+                      ? "Show less"
+                      : `Show all ${unlockedThings.length}`}
                     <ChevronDown
                       className={cn("size-4 transition-transform", {
                         "rotate-180": showAllItems,

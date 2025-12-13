@@ -15,6 +15,17 @@ export default defineSchema({
     ),
     startedAt: v.number(),
     accumulatedSeconds: v.number(),
+    accumulatedCost: v.optional(v.number()), // Cost snapshot when settings changed
+    costStartedAt: v.optional(v.number()), // When current rate started (for cost calculation)
+    settingsHistory: v.optional(
+      v.array(
+        v.object({
+          timestamp: v.number(),
+          participants: v.number(),
+          hourlyWage: v.number(),
+        }),
+      ),
+    ),
     pausedAt: v.optional(v.number()),
     finishedAt: v.optional(v.number()),
     finalElapsedSeconds: v.optional(v.number()),
