@@ -21,7 +21,7 @@ export interface WeightedAverages {
 export function calculateWeightedAverages(
   settingsHistory: SettingsHistoryEntry[],
   meetingStartedAt: number,
-  finalElapsedSeconds: number,
+  finalElapsedSeconds: number
 ): WeightedAverages | null {
   if (settingsHistory.length === 0) {
     return null;
@@ -95,17 +95,18 @@ export function getShareableSummary({
 
   // Calculate weighted averages if settings history is available
   const averages =
-    settingsHistory && meetingStartedAt
-      ? calculateWeightedAverages(
-          settingsHistory,
-          meetingStartedAt,
-          finalElapsedSeconds,
-        )
-      : null;
+    settingsHistory && meetingStartedAt ?
+      calculateWeightedAverages(
+        settingsHistory,
+        meetingStartedAt,
+        finalElapsedSeconds
+      )
+    : null;
 
   const hasVariation = averages?.hasVariation ?? false;
-  const displayParticipants = hasVariation
-    ? `~${averages!.avgParticipants.toFixed(1)} (avg)`
+  const displayParticipants =
+    hasVariation ?
+      `~${averages!.avgParticipants.toFixed(1)} (avg)`
     : participants.toString();
 
   return `${name}
@@ -114,7 +115,7 @@ Participants: ${displayParticipants}
 Duration: ${formatDuration(finalElapsedSeconds)}
 Cost per minute: ${formatCurrency(costPerMinute, currency)}
 
-Congratulation, this meeting wasted a total of ${formatCurrency(finalTotal, currency)}!`;
+This meeting wasted a total of ${formatCurrency(finalTotal, currency)}!`;
 }
 
 export function getShareableLink(meetingId: string): string {
