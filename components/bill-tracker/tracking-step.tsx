@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  deleteMeetingAction,
-  finishMeetingAction,
-  pauseMeetingAction,
-  resumeMeetingAction,
-} from "@/app/actions/meetings";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { MilestoneList } from "@/components/milestone/milestone-list";
 import { NextMilestone } from "@/components/milestone/next-milestone";
 import { Button } from "@/components/ui/button";
@@ -13,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CURRENCIES, CurrencyCode } from "@/lib/currency";
 import { ThingInCurrency, THINGS } from "@/lib/things";
 import { getShareableLink } from "@/lib/utils";
+import { useMutation } from "convex/react";
 import { Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -21,12 +18,12 @@ import { LiveTotal } from "./live-total";
 
 interface TrackingStepProps {
   name: string;
-  meetingId: string;
+  meetingId: Id<"meetings">;
   participants: number;
   currency: CurrencyCode;
   hourlyWage: number;
   status: "tracking" | "paused";
-  startedAt: string;
+  startedAt: number;
   accumulatedSeconds: number;
   readonly?: boolean;
   controlToken?: string;
@@ -47,6 +44,12 @@ export function TrackingStep({
   const router = useRouter();
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
+  // Convex mutations
+  const pauseMeeting = useMutation(api.meetings.pause);
+  const resumeMeeting = useMutation(api.meetings.resume);
+  const finishMeeting = useMutation(api.meetings.finish);
+  const removeMeeting = useMutation(api.meetings.remove);
+
   // Set up interval to update current time when tracking
   useEffect(() => {
     if (status === "paused") {
@@ -66,8 +69,7 @@ export function TrackingStep({
       return accumulatedSeconds;
     }
 
-    const startTime = new Date(startedAt).getTime();
-    const elapsedSinceStart = Math.floor((currentTime - startTime) / 1000);
+    const elapsedSinceStart = Math.floor((currentTime - startedAt) / 1000);
     return accumulatedSeconds + Math.max(0, elapsedSinceStart);
   }, [status, startedAt, accumulatedSeconds, currentTime]);
 
@@ -100,17 +102,16 @@ export function TrackingStep({
     if (!controlToken) return;
 
     if (status === "tracking") {
-      const result = await pauseMeetingAction(meetingId, controlToken);
-      if (result.success) {
-        router.refresh();
-      } else {
+      const result = await pauseMeeting({ id: meetingId, token: controlToken });
+      if (!result.success) {
         toast.error("Failed to pause meeting");
       }
     } else {
-      const result = await resumeMeetingAction(meetingId, controlToken);
-      if (result.success) {
-        router.refresh();
-      } else {
+      const result = await resumeMeeting({
+        id: meetingId,
+        token: controlToken,
+      });
+      if (!result.success) {
         toast.error("Failed to resume meeting");
       }
     }
@@ -119,7 +120,7 @@ export function TrackingStep({
   const handleStop = async () => {
     if (!controlToken) return;
 
-    const result = await deleteMeetingAction(meetingId, controlToken);
+    const result = await removeMeeting({ id: meetingId, token: controlToken });
     if (result.success) {
       router.push("/");
     } else {
@@ -130,10 +131,8 @@ export function TrackingStep({
   const handleFinish = async () => {
     if (!controlToken) return;
 
-    const result = await finishMeetingAction(meetingId, controlToken);
-    if (result.success) {
-      router.refresh();
-    } else {
+    const result = await finishMeeting({ id: meetingId, token: controlToken });
+    if (!result.success) {
       toast.error("Failed to finish meeting");
     }
   };

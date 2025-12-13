@@ -22,31 +22,37 @@ import { CURRENCIES, CurrencyCode, formatCurrency } from "@/lib/currency";
 import { generateName } from "@/lib/name-generator";
 import { Separator } from "@/components/ui/separator";
 import { WandSparkles } from "lucide-react";
+import { useMutation } from "convex/react";
+import { useState } from "react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
-interface SetupStepProps {
-  name: string;
-  setName: (value: string) => void;
-  participants: number;
-  setParticipants: (value: number) => void;
-  currency: CurrencyCode;
-  setCurrency: (value: CurrencyCode) => void;
-  hourlyWage: number;
-  setHourlyWage: (value: number) => void;
-  onStart: () => void;
-}
+export function SetupStep() {
+  const router = useRouter();
+  const createMeeting = useMutation(api.meetings.create);
 
-export function SetupStep({
-  name,
-  setName,
-  participants,
-  setParticipants,
-  currency,
-  setCurrency,
-  hourlyWage,
-  setHourlyWage,
-  onStart,
-}: SetupStepProps) {
+  const [name, setName] = useState<string>("");
+  const [participants, setParticipants] = useState<number>(5);
+  const [currency, setCurrency] = useState<CurrencyCode>("CHF");
+  const [hourlyWage, setHourlyWage] = useState<number>(150);
+
   const symbol = CURRENCIES.find((c) => c.code === currency)?.symbol ?? "CHF";
+
+  async function handleStart() {
+    // Auto-generate name if empty
+    const meetingName = name.trim() || generateName();
+
+    // Create meeting in Convex
+    const { id, controlToken } = await createMeeting({
+      name: meetingName,
+      participants,
+      currency,
+      hourlyWage,
+    });
+
+    // Redirect to meeting page with control token
+    router.push(`/meeting/${id}?token=${controlToken}`);
+  }
 
   return (
     <Card>
@@ -184,7 +190,7 @@ export function SetupStep({
         </div>
 
         <div className="mt-8 flex justify-center">
-          <Button size="lg" variant="special" onClick={onStart}>
+          <Button size="lg" variant="special" onClick={handleStart}>
             Start Tracking
           </Button>
         </div>

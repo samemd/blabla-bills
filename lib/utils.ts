@@ -32,9 +32,9 @@ export function getShareableSummary({
 
 Participants: ${participants}
 Duration: ${formatDuration(finalElapsedSeconds)}
-${formatCurrency(costPerMinute, currency)}/minute
+Cost per minute: ${formatCurrency(costPerMinute, currency)}
 
-This meeting wasted a total of ${formatCurrency(finalTotal, currency)}`;
+Congratulation, this meeting wasted a total of ${formatCurrency(finalTotal, currency)}!`;
 }
 
 export function getShareableLink(meetingId: string): string {

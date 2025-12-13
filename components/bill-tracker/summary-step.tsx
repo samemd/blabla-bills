@@ -1,5 +1,6 @@
 "use client";
 
+import { Id } from "@/convex/_generated/dataModel";
 import { Milestone } from "@/components/milestone/milestone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +28,7 @@ import { MeetingStats } from "./meeting-stats";
 
 interface SummaryStepProps {
   name: string;
-  meetingId: string;
+  meetingId: Id<"meetings">;
   participants: number;
   currency: CurrencyCode;
   hourlyWage: number;
@@ -73,7 +74,7 @@ export function SummaryStep({
           finalElapsedSeconds,
           finalTotal,
           currency,
-        })
+        }),
       );
       toast.success("Copied to clipboard!");
     } catch {
@@ -166,9 +167,9 @@ export function SummaryStep({
                     onClick={() => setShowAllItems(!showAllItems)}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {showAllItems ?
-                      "Show less"
-                    : `Show all ${unlockedThings.length}`}
+                    {showAllItems
+                      ? "Show less"
+                      : `Show all ${unlockedThings.length}`}
                     <ChevronDown
                       className={cn("size-4 transition-transform", {
                         "rotate-180": showAllItems,
