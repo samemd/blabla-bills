@@ -22,7 +22,7 @@ export function MeetingView({ meetingId, token }: MeetingViewProps) {
   if (meeting === undefined) {
     return (
       <Card className="border-slate-200/70 bg-white/70 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
-        <CardContent className="flex min-h-[400px] items-center justify-center px-6 md:px-8">
+        <CardContent className="flex min-h-[494px] items-center justify-center px-6 md:px-8">
           <div className="flex flex-col items-center gap-4">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-500" />
             <p className="text-muted-foreground">Loading meeting...</p>
@@ -36,7 +36,7 @@ export function MeetingView({ meetingId, token }: MeetingViewProps) {
   if (meeting === null) {
     return (
       <Card className="border-slate-200/70 bg-white/70 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
-        <CardContent className="flex min-h-[300px] flex-col items-center justify-center gap-4 px-6 md:px-8">
+        <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-4 px-6 md:px-8">
           <h2 className="text-2xl font-bold text-foreground">
             Meeting not found
           </h2>
